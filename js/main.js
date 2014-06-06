@@ -52,7 +52,7 @@ window.onload = function(){
 		bg1.image = game.assets["img/desktexture.png"];
 		game.rootScene.addChild(bg1);
 		
-		//ÉAÉEÉg
+		//„Ç¢„Ç¶„Éà
 		var out = Class.create(Sprite, {
 			initialize: function(width, height, x, y){
 				Sprite.call(this, width, height);
@@ -63,7 +63,7 @@ window.onload = function(){
 			}
 		});
 
-		//éw
+		//Êåá
 		var Finger = Class.create(PhyBoxSprite, {
 			initialize: function(){
 				PhyBoxSprite.call(this, FING_WIDTH, FING_WIDTH, 
@@ -72,7 +72,7 @@ window.onload = function(){
 			}
 		});
 		
-		//íËãK
+		//ÂÆöË¶è
 		var Ruler = Class.create(PhyBoxSprite, {
 			initialize: function(){
 				PhyBoxSprite.call(this, RULER_WIDTH, RULER_HEIGHT, 
@@ -92,7 +92,7 @@ window.onload = function(){
 			
 		});
 		
-		//å≈íËï®éø
+		//Âõ∫ÂÆöÁâ©Ë≥™
 		var Obj = Class.create(PhyBoxSprite, {
 			initialize: function(width, height, x, y, d, img){
 				PhyBoxSprite.call(this, width, height, 
@@ -112,7 +112,7 @@ window.onload = function(){
 		
 
 
-		//è¡ÇµÉSÉÄ
+		//Ê∂à„Åó„Ç¥„É†
 		var Eraser = Class.create(PhyBoxSprite, {
 			initialize: function(x, y, img){
 				PhyBoxSprite.call(this, ERASER_WIDTH, ERASER_HEIGHT, 
@@ -122,9 +122,10 @@ window.onload = function(){
 				this.image = game.assets[img];
 				this.fing = new Finger();
 				this.can = false;
+				this.movestart = false;
 				game.rootScene.addChild(this);
 			
-					//ÉNÉäÉbÉN
+					//„ÇØ„É™„ÉÉ„ÇØ
 					var firstflag;
 					var touchx;
 					var touchy;
@@ -139,10 +140,11 @@ window.onload = function(){
 							touchx = e.localX;
 							touchy = e.localY;
 							firstflag = true;
+							this.release = false;
 						}
 					});
 					
-					//ÉhÉâÉbÉO
+					//„Éâ„É©„ÉÉ„Ç∞
 					this.addEventListener('touchmove', function(e){
 						if(this.can){
 							this.x = fixedx;
@@ -167,31 +169,34 @@ window.onload = function(){
 						}
 					});
 					
-					//ÉhÉâÉbÉOâèú
+					//„Éâ„É©„ÉÉ„Ç∞Ëß£Èô§
 					this.addEventListener('touchend', function(e){
+							this.release = true;
 							surface.clear();			
 							var vecterx = (touchx - e.localX) / VECTER_VALUE;
 							var vectery = (touchy - e.localY) / VECTER_VALUE; 
 							var vecter = new b2Vec2(vecterx, vectery);
 							this.fing.applyImpulse(vecter);
-							this.can = false;
 					});
 				
-				//è’ìÀîªíËÅEñÄéC
+				//Ë°ùÁ™ÅÂà§ÂÆö„ÉªÊë©Êì¶
 				this.addEventListener(Event.ENTER_FRAME, function(){
 				
-					//éwÇ∆è¡ÇµÉSÉÄÇÃè’ìÀ
-					if(this.vx * this.vx + this.vy * this.vy > 0){
+					//Êåá„Å®Ê∂à„Åó„Ç¥„É†„ÅÆË°ùÁ™Å
+					if(this.vx * this.vx + this.vy * this.vy > 0 && this.release){
 						game.rootScene.removeChild(this.fing);
+						this.movestart = true;
+						this.can = false;
+						this.release = false;
 					}
 					
-					//óéâ∫
+					//ËêΩ‰∏ã
 					if(this.centerX < LEFT_EDGE || this.centerX > RIGHT_EDGE || 
 					   this.centerY < UPPER_EDGE || this.centerY > DOWNER_EDGE){
 					   game.rootScene.removeChild(this);
 					}
 					
-					//ñÄéC
+					//Êë©Êì¶
 					if(this.vx * this.vx + this.vy * this.vy >= STOP_VALUE){
 						this.vx = this.vx *  FRICTION_VALUE;
 						this.vy = this.vy *  FRICTION_VALUE;
@@ -228,56 +233,57 @@ window.onload = function(){
 	 	var pencace = new Obj(PENCASE_WIDTH, PENCASE_HEIGHT, OUT_WIDTH, DOWNER_EDGE - PENCASE_HEIGHT, PENCASE_DENSITY, "img/pencase.png");
 	 	var notebook = new Obj(NOTEBOOK_WIDTH, NOTEBOOK_HEIGHT, RIGHT_EDGE - NOTEBOOK_WIDTH, OUT_WIDTH, NOTEBOOK_DENSITY, "img/notebook.png");
 	 	
-	 	//É^Å[Éìêß
+	 	//„Çø„Éº„É≥Âà∂
 	 	var turn = 1;
 	 	var fixedx;
 		var fixedy;
 		var eraser_fixedangle;
 		var ruler_fixedangle;
-		var firstflag = true;
+		var initflag = true;
 		game.addEventListener(Event.ENTER_FRAME, function(){
+			console.log("turn", turn, "initflag", initflag)
 		 	if(turn == 1){
-		 		if(firstflag){
+		 		if(initflag){
 		 			eraser1.can = true;
-		 			firstflag = false;
+		 			eraser1.movestart = false;
+		 			initflag = false;
+		 			fixedx = eraser2.x;
+					fixedy = eraser2.y;
+					eraser_fixedangle = eraser2.angle;
+					ruler_fixedangle = ruler.angle;
 		 		}
-		 		eraser1.addEventListener('touchstart', function(e){
-						fixedx = eraser2.x;
-						fixedy = eraser2.y;
-						eraser_fixedangle = eraser2.angle;
-						ruler_fixedangle = ruler.angle;
-					});
-				eraser1.addEventListener('touchmove', function(e){
-							eraser2.x = fixedx;
-							eraser2.y = fixedy;
-							eraser2.angle = ruler_fixedangle;
-							ruler.angle = ruler_fixedangle;
-				});
+				if(!eraser1.movestart){
+					eraser2.x = fixedx;
+					eraser2.y = fixedy;
+					eraser2.angle = eraser_fixedangle;
+					ruler.angle = ruler_fixedangle;
+				}
 				if(eraser1.can == false && eraser1.vx ==  0 && eraser1.vy == 0){
 					turn = 2;
-					firstflag = true;
+					initflag = true;
+					eraser1.movestart = true;
 				}
 		 	}
 		 	if(turn == 2){
-			 	if(firstflag){
-			 			eraser2.can = true;
-			 			firstflag = false;
-			 		}
-		 		eraser2.addEventListener('touchstart', function(e){
-						fixedx = eraser1.x;
-						fixedy = eraser1.y;
-						eraser_fixedangle = eraser1.angle;
-						ruler_fixedangle = ruler.angle;
-					});
-				eraser2.addEventListener('touchmove', function(e){
-							eraser1.x = fixedx;
-							eraser1.y = fixedy;
-							eraser1.angle = ruler_fixedangle;
-							ruler.angle = ruler_fixedangle;
-				});
+		 		if(initflag){
+		 			eraser2.can = true;
+		 			eraser2.movestart = false;
+		 			initflag = false;
+		 			fixedx = eraser1.x;
+					fixedy = eraser1.y;
+					eraser_fixedangle = eraser1.angle;
+					ruler_fixedangle = ruler.angle;
+		 		}
+				if(!eraser2.movestart){
+					eraser1.x = fixedx;
+					eraser1.y = fixedy;
+					eraser1.angle = eraser_fixedangle;
+					ruler.angle = ruler_fixedangle;
+				}
 				if(eraser2.can == false && eraser2.vx ==  0 && eraser2.vy == 0){
 					turn = 1;
-					firstflag = true;
+					initflag = true;
+					eraser2.movestart = true;
 				}
 		 	}
 		 });
