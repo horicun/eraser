@@ -1,0 +1,4 @@
+# do not follow backups and some garbage files
+Thumbs.db
+*~
+*ƒRƒs[.js
